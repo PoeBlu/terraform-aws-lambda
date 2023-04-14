@@ -39,11 +39,7 @@ def delete_old_archives():
                 if file_modified < delete_older_than:
                     os.remove(name)
             except OSError as error:
-                if error.errno == errno.ENOENT:
-                    # Ignore "not found" errors as they are probably race
-                    # conditions between multiple usages of this module.
-                    pass
-                else:
+                if error.errno != errno.ENOENT:
                     raise
 
 
@@ -56,9 +52,7 @@ def list_files(top_path):
     results = []
 
     for root, dirs, files in os.walk(top_path):
-        for file_name in files:
-            results.append(os.path.join(root, file_name))
-
+        results.extend(os.path.join(root, file_name) for file_name in files)
     results.sort()
     return results
 
@@ -95,10 +89,10 @@ def update_hash(hash_obj, file_root, file_path):
 
     with open(file_path, 'rb') as open_file:
         while True:
-            data = open_file.read(1024)
-            if not data:
+            if data := open_file.read(1024):
+                hash_obj.update(data)
+            else:
                 break
-            hash_obj.update(data)
 
 
 # Parse the query.

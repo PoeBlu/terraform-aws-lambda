@@ -36,7 +36,7 @@ def format_command(command):
     args = []
     for arg in command:
         if ' ' in arg:
-            args.append('"' + arg + '"')
+            args.append(f'"{arg}"')
         else:
             args.append(arg)
     return ' '.join(args)
@@ -137,9 +137,9 @@ with tempdir() as temp_dir:
             target_path = os.path.join(temp_dir, file_name)
             target_dir = os.path.dirname(target_path)
             if not os.path.exists(target_dir):
-                print('mkdir -p {}'.format(target_dir))
+                print(f'mkdir -p {target_dir}')
                 os.makedirs(target_dir)
-            print('cp {} {}'.format(file_name, target_path))
+            print(f'cp {file_name} {target_path}')
             shutil.copyfile(file_name, target_path)
             shutil.copymode(file_name, target_path)
 
@@ -148,10 +148,7 @@ with tempdir() as temp_dir:
         requirements = os.path.join(temp_dir, 'requirements.txt')
         if os.path.exists(requirements):
             with cd(temp_dir):
-                if runtime.startswith('python3'):
-                    pip_command = 'pip3'
-                else:
-                    pip_command = 'pip2'
+                pip_command = 'pip3' if runtime.startswith('python3') else 'pip2'
                 run(
                     pip_command,
                     'install',
@@ -163,4 +160,4 @@ with tempdir() as temp_dir:
     # Zip up the temporary directory and write it to the target filename.
     # This will be used by the Lambda function as the source code package.
     create_zip_file(temp_dir, absolute_filename)
-    print('Created {}'.format(filename))
+    print(f'Created {filename}')

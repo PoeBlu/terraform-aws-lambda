@@ -33,7 +33,7 @@ if filename_old == filename_new:
         subprocess.check_output(build_command, shell=True, cwd=module_relpath)
 
 # Output the filename to Terraform.
-json.dump({
-    'filename': module_relpath + '/' + filename_new,
-}, sys.stdout, indent=2)
+json.dump(
+    {'filename': f'{module_relpath}/{filename_new}'}, sys.stdout, indent=2
+)
 sys.stdout.write('\n')
